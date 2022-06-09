@@ -1,4 +1,4 @@
-# FAQ
+# Building Slideshow
 
 ## How do I build slides?
 

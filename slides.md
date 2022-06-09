@@ -56,21 +56,10 @@ class: top
 - Generate C++ wrappers for native python types.
 - Python `PyObject` wrappers for C++ types.
 
-???
-This is the first sentence from the pybind11 docs. It summarises things quite nicely.
-
-Primary use case would be this: you have a C++ library, and want to generate python language bindings for it. It does
-not require you to really know python at all, but some knowledge can help. Syntactically you create a python module
-from your C++ code by writing some more C++. 
-
 ---
 class: top
 
 # Motivations - Alternatives
-
-???
-I'm going to skip over the explanation of why we would want call compiled code from python rather than just writing
-python code directly, assuming we are already familiar with those motivations. 
 
 --
 
@@ -78,37 +67,15 @@ python code directly, assuming we are already familiar with those motivations.
 The most low-level option. Your library must have an `extern "C"` interface. It is not easy to export types from
 your library, and you must use C data types at the call site. It does not scale well.
 
-???
-**ctypes**
-- You don't need the source for the C-library.
-- If you have a C-API you only need to write python code. But still kind of need to know what is going on in C
-- Manually handle python-to-c type conversions (POD) 
-- Significant amount of work if you are going to export a rich C++ api
-
 --
 ### Cython
 Generating bindings for a C++ library will require writing and maintaining a layer in the Cython language which is 
 neither python, nor C. Shines when you want to accelerate parts of the codebase.
 
-???
-**Cython** 
-- Numpy makes heavy use of it
-- Great for accelerating parts of your python library.
-- Requires working with a 3rd intermediate language
-- Not a great solution if you want to add a python API for a C++ library.
-
-
 --
 ### Boost.Python
 Very similar to pybind11 in features and syntax. You write binding code in C++. 
 Mostly, you are selectively adding features to the python API. The main drawback is boost itself. 
-
-???
-**Boost.Python** 
-- Bindings written in C++
-- With static reflection you probably wouldn't have to write very much code
-- Adds a Boost Dependency, and that is where pybind11 comes in.
-
 
 ---
 
@@ -118,12 +85,6 @@ Mostly, you are selectively adding features to the python API. The main drawback
 > relevant for binding generation. This compact implementation was possible thanks to some of the new C++11 features...
 
 .center[_Leveraging C++11 features to write a compact library for python bindings, hence the name *pybind11*._]
-
-???
-Again from the pybind11 docs. 
-
-There you have it, something that works very much like boost.python, but does not depend on boost. It is much more
-lightweight and due to its simplicity (header only), only depends on python itself. 
 
 ---
 
@@ -150,10 +111,6 @@ pip install cppimport
 <br>
 ]
 ]
-
-???
-cppimport is a nice way to get started quickly, simple single-file extensions are a breeze. 
-I used it to create the self-contained examples I am showing here. 
 
 ---
 
@@ -187,11 +144,6 @@ A few notes:
 ]
 ]
 
-???
-Not every day that even the most basic example fits on one slide. Go over how I will present examples. Not brave enough
-to do it live, so I have static excerpts with full working demos in the repo. I just want to go over the boiler plate
-above/below the code once since it will be used throughout the examples.
-
 ---
 
 # Writing a simple module
@@ -223,24 +175,12 @@ We can import this and run it directly:
 It will take a moment to (re)-compile after editing
 ]
 
-???
-Take a moment to talk about what we have here. A simple, but complete example of a python module written in C++. 
-
-Less than 20 lines, including w-space and boilerplate. 
-
-Not very interesting, so lets look at a more interesting examples.
-
 ---
 # Docstrings
 
 When generating python bindings it is important to consider that the user of that API will be expecting certain things
 from a python library. Docstrings area great example, there is no need to support `help()` in C++.
 
-
-???
-I am also kind of surprised at how well the default is constructed
-
-This example also hints at how things are working under the hood so I like to talk about it first. 
 
 ---
 # Docstrings
@@ -251,19 +191,8 @@ This example also hints at how things are working under the hood so I like to ta
 add(...) method of builtins.PyCapsule instance
     add(arg0: float, arg1: float) -> float
 ```
-???
-Pybind11 is taking care of this for us. Of course we can override the default Docstrings, but the default gives a bit
-of insight into how pybind11 is working.
-
 --
 This is pretty good!
-
-???
-We have a fairly descriptive docstring out of the box, with argument and return type annotations.
-
-**NOTE** These are they python types it does not say `double`
-
-We don't have any indication of what the function does, but in this case the name is pretty descriptive
 
 --
 
@@ -271,15 +200,6 @@ We are missing argument names.
 
 
 
-???
-I love how you can specify named arguments, and defaults at both the definition and call site. I think it makes for
-clear code. 
-
-C++ has some of these concepts, sure argument are given symbols to use within the function scope and you can define
-defaults effectively making the argument optional, but not with the same amount of flexibility as python offers.
-
-In particular it is not *easy* to create an interface where you can use the same at the call site to assign a value to
-the argument slot, that only happens by the position. 
 
 ---
 # Docstrings - named arguments
@@ -302,9 +222,6 @@ Similar to `import numpy as np`
 ]
 ]
 
-???
-Quick note before we dive into example 2 we have introduced the universally accepted alias for the pybind11 namespace.
-It is used through the documentation and by most users. 
 
 ---
 # Docstrings - named arguments
@@ -323,10 +240,6 @@ PYBIND11_MODULE(example1, m) {
 We have now attached names to our arguments by annotating the function binding with some additional information.
 ]
 ]
-
-???
-This `py::arg` is a special tag class that can be passed to convey metadata to the method we are calling
-`module_::def()`
 
 ---
 # Docstrings - More Metadata
@@ -347,16 +260,6 @@ We can also specify the default values for the arguments.
 The number of arguments is statically checked, however the types are not!
 ]
 ]
-
-???
-Lack of type checking is unfortunate. 
-
-What will happen if we say added `py::arg("c")` to this list is a compile error. Static assert makes for a clear error
-message which is nice!
-
-If we instead did `py::arg("a") = "cat"`, we get a somewhat cryptic type error. I will leave that as an exercise for the reader,
-but the generated message template implies that the problem is with the user provided argument not any of the
-defaults!
 
 ---
 
@@ -390,11 +293,6 @@ subtract(...) method of builtins.PyCapsule instance
 
     Computes a - b
 ```
-
-???
-We have explored the binding of simple functions, using the metadata annotations and some of the simple features for
-bringing python-isims into C++.
-
 
 ---
 class: top
@@ -432,9 +330,6 @@ PYBIND11_MODULE(example3, m) {
 - The `py::init` wrapper is used to bind constructors for a class
 - The template parameters should correspond to a constructor signature
 - Without template parameters a callable can be provided which returns the type by value or the appropriate "holder"
-
-???
-We will discuss holder types in a bit, but first this is good opportunity to demo overloading
 
 ---
 class: top
@@ -504,9 +399,6 @@ We can also use a lambda.
         /*setter*/[](Pet& self, std::string value) { self.name = value; })
 ```
 
-???
-Anywhere a function may go, binding a function to the module, a method to a class defining a property a lambda will
-also be accepted!
 
 ---
 class: top
@@ -585,7 +477,6 @@ py::class_<Reader>(m, "Reader")
 .g-3[
 ]
 ]
-???
 
 ---
 # Binding Overloads
@@ -605,10 +496,6 @@ py::class_<Reader>(m, "Reader")
     .def("read", py::overload_cast<size_t>(&Reader::read))
 ```
 **Note:** The `py::init` wrapper we use to bind constructors takes care of this for us
-
-???
-The return type is deduced as we can't overload based on return type this makes sense
-
 
 ---
 
@@ -869,7 +756,7 @@ int main()
 {
     using namespace py::literals;
     py::scoped_interpreter guard{};
-    py::module_ np = py::module_::import("numpy")
+    py::module_ np = py::module_::import("numpy");
     py::object x = np.attr("arange")(0, 100);
     py::module_ plots= py::module_::import("plots");
     plots.attr("plot_x_squared")(x);
