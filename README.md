@@ -1,6 +1,7 @@
-# Pybind11 Tech Share 
+# pybind11 Tech Share
 
 # Slides
+- [View slides in browser](https://amjames.github.io/pybind11-tech-share/)
 - [pdf render is available](slides.pdf)
 - See [BUILDING](BUILDING.md) to build/run the slideshow in the browser
 
